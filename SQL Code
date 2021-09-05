@@ -1,0 +1,15 @@
+CREATE TABLE `moviereviews`.`friendsmoviesreviews` (
+  `Friend` VARCHAR(45) NOT NULL,
+  `Parasite` INT NULL,
+  `Avengers: Endgame` INT NULL,
+  `Us` INT NULL,
+  `Soul` INT NULL,
+  `Sound of Metal` INT NULL,
+  PRIMARY KEY (`Friend`));
+INSERT INTO `moviereviews`.`friendsmoviesreviews` (`Friend`, `Parasite`, `Avengers: Endgame`, `Us`, `Soul`, `Sound of Metal`, `Knives Out`) VALUES ('Joe', '4', '4', '5', '4', '4', '3');
+INSERT INTO `moviereviews`.`friendsmoviesreviews` (`Friend`, `Parasite`, `Avengers: Endgame`, `Us`, `Soul`, `Sound of Metal`, `Knives Out`) VALUES ('Jack', '3', '5', '5', '1', '2', '2');
+INSERT INTO `moviereviews`.`friendsmoviesreviews` (`Friend`, `Parasite`, `Avengers: Endgame`, `Us`, `Soul`, `Sound of Metal`, `Knives Out`) VALUES ('Chelsea', '5', '2', '5', '5', '5', '4');
+INSERT INTO `moviereviews`.`friendsmoviesreviews` (`Friend`, `Us`, `Sound of Metal`, `Knives Out`) VALUES ('Isla', '5', '3', '3');
+INSERT INTO `moviereviews`.`friendsmoviesreviews` (`Friend`, `Avengers: Endgame`, `Soul`) VALUES ('Marco', '5', '3');
+
+ADD COLUMN `Knives Out` INT NULL DEFAULT NULL AFTER `Sound of Metal`;
