@@ -1,0 +1,36 @@
+---
+title: "DATA 607 Week Two Assignment"
+author: "Tyler Baker"
+date: "9/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('tidyverse')
+```
+
+## Assignment #2
+
+This week our task is to create a table in a SQL database and import it into R. Then we can experiment with the data.
+
+
+
+```{r friends_movie_reviews}
+friends_movie_reviews <- read.csv('https://raw.githubusercontent.com/tylerbaker01/SQL-Movie-Review-Table/main/friendsmoviereviews.csv')
+```
+
+## Plot Experimentation
+
+I wanted to generate which friends are the pickiest of movie watchers. Therefore, I attempted to create a new column for the amount of films each friend has seen. Then I wanted to create another vector where it would give the average review of each friend. Finally, I was going to graph a plot to see who rated movies the highest and who was a tough crowd. 
+
+Unfortunately, I am almost certain my function isn't working because of the null values. I do not know how to alleviate the issue. From my understanding NULL should simply be ignored when using a sum function. However, this does not seem to be the case. 
+
+```{r pressure, echo=FALSE}
+friends_movie_reviews <- friends_movie_reviews %>%
+  mutate(AmountSeen = rowSums(friends_movie_reviews[2:7], na.rm=TRUE))
+friends_movie_reviews <- friends_movie_reviews %>%
+  mutate(Average_Review = ("Parasite" + "Avengers: Endgame" + "Us" + "Soul" + "Sound of Metal" + "Knives Out")/ AmountSeen)
+```
+
+
