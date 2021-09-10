@@ -2,7 +2,11 @@
 title: "DATA 607 Week Two Assignment"
 author: "Tyler Baker"
 date: "9/5/2021"
-output: html_document
+output:
+  html_document:
+    df_print: paged
+  prettydoc::html_pretty:
+    theme: cayman
 ---
 
 ```{r setup, include=FALSE}
@@ -12,25 +16,122 @@ library('tidyverse')
 
 ## Assignment #2
 
-This week our task is to create a table in a SQL database and import it into R. Then we can experiment with the data.
+This week our task is to create a table in a SQL database and import it into R. Then we can experiment with the data.Ways to handle NULL data.
+
+### The Setup
+I started with six movies that came out over the past few years. I then asked five friends to review them on a scale of 1 to 5. If they had not seen the movie then they were told to leave it blank, which would be stored as a NULL.
 
 
 
 ```{r friends_movie_reviews}
 friends_movie_reviews <- read.csv('https://raw.githubusercontent.com/tylerbaker01/SQL-Movie-Review-Table/main/friendsmoviereviews.csv')
 ```
+# Structuring the Data
+``` {r structureing the data}
+str(friends_movie_reviews)
+#shows the structure of the data table.
+names(friends_movie_reviews) <- tolower(names(friends_movie_reviews))
+#changes the column names to lower case.
+friends_movie_reviews[friends_movie_reviews =="NULL"] <- NA
+#R cannot read NULL, must convert NULL into NA.
 
-## Plot Experimentation
-
-I wanted to generate which friends are the pickiest of movie watchers. Therefore, I attempted to create a new column for the amount of films each friend has seen. Then I wanted to create another vector where it would give the average review of each friend. Finally, I was going to graph a plot to see who rated movies the highest and who was a tough crowd. 
-
-Unfortunately, I am almost certain my function isn't working because of the null values. I do not know how to alleviate the issue. From my understanding NULL should simply be ignored when using a sum function. However, this does not seem to be the case. 
-
-```{r pressure, echo=FALSE}
-friends_movie_reviews <- friends_movie_reviews %>%
-  mutate(AmountSeen = rowSums(friends_movie_reviews[2:7], na.rm=TRUE))
-friends_movie_reviews <- friends_movie_reviews %>%
-  mutate(Average_Review = ("Parasite" + "Avengers: Endgame" + "Us" + "Soul" + "Sound of Metal" + "Knives Out")/ AmountSeen)
+friends_movie_reviews$parasite <- as.numeric(friends_movie_reviews$parasite)
+friends_movie_reviews$avengers..endgame <- as.numeric(friends_movie_reviews$avengers..endgame)
+friends_movie_reviews$us <- as.numeric(friends_movie_reviews$us)
+friends_movie_reviews$soul <- as.numeric(friends_movie_reviews$soul)
+friends_movie_reviews$sound.of.metal <- as.numeric(friends_movie_reviews$sound.of.metal)
+friends_movie_reviews$knives.out <- as.numeric(friends_movie_reviews$knives.out)
+#Converted each movie column into a numeric value instead of a character value.
 ```
 
+## Data Experimentation
 
+What is the best way to handle NA's. I thought Cassie's view was quite clever therefore, I will do as she did to see what happens to the data. First I will allow the NA's to be counted as a 1. Then I will allow my NA's to be counted as a 3. I will also convert NA's into 2 to account for people that don't want to watch a movie because they just didn't seem interested in it, they don't absolutely hate it, they just were disinterested when they saw the previews. The only downfall with this trick is that it doesn't account for instances where someone thinks they will not like a movie, but ends up watching and loves it. There are simply movies that surprise us.
+
+```{r data experimentation}
+friends_movie_reviews_one <- friends_movie_reviews %>% mutate_all(~replace(., is.na(.), 1))
+#Turned NA's into the value 1.
+friends_movie_reviews_two <- friends_movie_reviews %>% mutate_all(~replace(., is.na(.), 2))
+#Turned NA's into 2.
+friends_movie_reviews_three <- friends_movie_reviews %>% mutate_all(~replace(., is.na(.), 3))
+#Turned NA's into 3.
+str(friends_movie_reviews_one)
+```
+
+#Finding Averages
+
+```{r finding averages}
+#Column Wise
+
+
+colMeans(friends_movie_reviews_one[sapply(friends_movie_reviews_one, is.numeric)])
+movie_averages_one<- c("avg_rating", 2.9, 3.53, 3.97, 2.83, 2.933, 2.689, 3.14)
+
+#movie_averages <- colMeans(friends_movie_reviews_one[sapply(friends_movie_reviews_one, is.numeric)])
+##The average of each column is appearing in the previous column. not sure how to fix.
+friends_movie_reviews_one <- rbind(friends_movie_reviews_one, movie_averages_one)
+#add a row for the averages
+
+colMeans(friends_movie_reviews_two[sapply(friends_movie_reviews_two, is.numeric)])
+movie_averages_two <- c("avg_rating", 3.2, 3.6, 4.4, 3.0, 3.2, 2.8, 3.367)
+friends_movie_reviews_two <- rbind(friends_movie_reviews_two, movie_averages_two)
+#Mean value of the columns turned into a row through manual input.
+##Ask professor about how to turn this process into a function.
+colMeans(friends_movie_reviews_three[sapply(friends_movie_reviews_three, is.numeric)])
+movie_averages_three <- c("avg-rating", 3.6, 3.8, 4.6, 3.2, 3.4, 3.0, 3.6)
+friends_movie_reviews_three <- rbind(friends_movie_reviews_three, movie_averages_three)
+
+#Convert Columns to Numeric... again
+#friends_movie_reviews_one
+friends_movie_reviews_one$parasite <- as.numeric(friends_movie_reviews_one$parasite)
+friends_movie_reviews_one$avengers..endgame <- as.numeric(friends_movie_reviews_one$avengers..endgame)
+friends_movie_reviews_one$us <- as.numeric(friends_movie_reviews_one$us)
+friends_movie_reviews_one$soul <- as.numeric(friends_movie_reviews_one$soul)
+friends_movie_reviews_one$sound.of.metal <- as.numeric(friends_movie_reviews_one$sound.of.metal)
+friends_movie_reviews_one$knives.out <- as.numeric(friends_movie_reviews_one$knives.out)
+
+#friends_movie_reviews_two
+friends_movie_reviews_two$parasite <- as.numeric(friends_movie_reviews_two$parasite)
+friends_movie_reviews_two$avengers..endgame <- as.numeric(friends_movie_reviews_two$avengers..endgame)
+friends_movie_reviews_two$us <- as.numeric(friends_movie_reviews_two$us)
+friends_movie_reviews_two$soul <- as.numeric(friends_movie_reviews_two$soul)
+friends_movie_reviews_two$sound.of.metal <- as.numeric(friends_movie_reviews_two$sound.of.metal)
+friends_movie_reviews_two$knives.out <- as.numeric(friends_movie_reviews_two$knives.out)
+
+#friends_movie_reviews_three
+friends_movie_reviews_three$parasite <- as.numeric(friends_movie_reviews_three$parasite)
+friends_movie_reviews_three$avengers..endgame <- as.numeric(friends_movie_reviews_three$avengers..endgame)
+friends_movie_reviews_three$us <- as.numeric(friends_movie_reviews_three$us)
+friends_movie_reviews_three$soul <- as.numeric(friends_movie_reviews_three$soul)
+friends_movie_reviews_three$sound.of.metal <- as.numeric(friends_movie_reviews_three$sound.of.metal)
+friends_movie_reviews_three$knives.out <- as.numeric(friends_movie_reviews_three$knives.out)
+
+#Row Wise
+friends_movie_reviews_one$Avg_review = rowMeans(friends_movie_reviews_one[2:7])
+#Calculated each friend's rating average, where NULL's =1.
+friends_movie_reviews_two$Avg_review = rowMeans(friends_movie_reviews_two[2:7])
+#Calculated each friend's rating average, where NULL's =2.
+friends_movie_reviews_three$Avg_review = rowMeans(friends_movie_reviews_three[2:7])
+#Calculated each friend's rating average, where NULL's =3.
+
+
+```
+
+#Graph
+We are just now going over graphing in 606. 
+
+```{r graph}
+
+```
+
+#Conclusion
+For the conclusion I want to compare how "Parasite" and "Us" perform in each orientation of NA. I chose these two because "Parasite" had the most NA's and I chose "Us" because it had perfect scores expect for the one NA.
+
+##Parasite
+The true average of "Parastie" is 4. We are searching to see which orientation is the closest to the true average. If NA=1 we get an average of 2.9. If NA=2 we get an average rating of 3.2. Finally, if we set NA=3 we get 3.6. Thus, in the case of Parasite it was best to set NA=1.
+
+##Us
+The true average of "Us" is 5. Again, we want to find which orientation gets the closest to 5. If NA=1 we get an average of 3.97, If we set NA=2 we get an average of 4.4. Finally, if we set NA=3 we get an average of 4.6. In this case, setting NA=3 was best decision. 
+
+##Final thoughts
+Since the two cases do not agree, I do not think that substituting any of these values is the best option. I would guess that substituting the NA's with the true average would probably be the way to produce the most accurate values.
